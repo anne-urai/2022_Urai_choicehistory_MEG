@@ -17,7 +17,7 @@ switch usr
     case 'aeurai' % cartesius/lisa
         path = '/projects/0/neurodec/Data/MEG-PL';
     case 'urai'
-        path = '~/Data//projects/0/neurodec/Data/MEG-PL';
+        path = '~/Data/projects/0/neurodec/Data/MEG-PL';
     case 'anne' % macbook pro
         path = '/Users/anne/Library/Group Containers/G69SCX94XU.duck/Library/Application Support/duck/Volumes/neurodec/Data/MEG-PL';
         path = '/Users/anne/Data/projects/0/neurodec/Data/MEG-PL'; % copied to local!
@@ -74,18 +74,18 @@ if ~isnumeric(sj),
     subjectdata.clean = subjectdata.all;
     subjectdata.clean(ismember(subjectdata.clean, 16)) = [];
 
-    % test for TFR
-    subjectdata.cleantmp = subjectdata.clean;
-    subjectdata.cleantmp(ismember(subjectdata.clean, 49)) = [];
+%     % test for TFR
+%     subjectdata.cleantmp = subjectdata.clean;
+%     subjectdata.cleantmp(ismember(subjectdata.clean, 49)) = [];
 
     % drug groups
     subjectdata.placebo     = [3,6,9,12,15,18,21,23,26,29,32,35,38,41,44,47,50,56,59];
     subjectdata.atomoxetine = [2,5,8,14,17,20,24,27,30,33,36,39,42,45,48,51,54,57,60,61,63,65];
     subjectdata.donepezil   = [4,7,10,13,19,22,25,28,31,34,40,43,46,49,52,53,55,58,62,64]; % exclude P16
     
-    % to check hand counterbalancing
-    subjectdata.lefthand    = intersect(2:2:65, subjectdata.cleantmp);
-    subjectdata.righthand   = intersect(3:2:65, subjectdata.cleantmp);
+%     % to check hand counterbalancing
+%     subjectdata.lefthand    = intersect(2:2:65, subjectdata.cleantmp);
+%     subjectdata.righthand   = intersect(3:2:65, subjectdata.cleantmp);
     
 else
     switch lower(sj)
@@ -95,7 +95,6 @@ else
             
         case 2
             
-            subjectdata.name                = 'LB';
             subjectdata.drug                = 'atomoxetine';
             
             subjectdata.session(1).recsorder            = [2 3]; % order for task recordings
@@ -110,7 +109,6 @@ else
             
         case 3
             
-            subjectdata.name                = 'PB';
             subjectdata.drug                = 'placebo';
             
             subjectdata.session(1).recsorder            = 1;
@@ -126,7 +124,6 @@ else
             
         case 4
             
-            subjectdata.name                = 'MS';
             subjectdata.drug                = 'donepezil';
             
             subjectdata.session(1).recsorder            = [1 2 3];
@@ -143,7 +140,6 @@ else
             
         case 5
             
-            subjectdata.name                = 'SR';
             subjectdata.drug                = 'atomoxetine';
             
             subjectdata.session(1).recsorder            = [1 2];
@@ -159,7 +155,6 @@ else
             
         case 6
             
-            subjectdata.name                = 'CK';
             subjectdata.drug                = 'placebo';
             
             subjectdata.session(1).recsorder            = 2;
@@ -173,7 +168,6 @@ else
             
         case 7
             
-            subjectdata.name                = 'SG';
             subjectdata.drug                = 'donepezil';
             
             subjectdata.session(1).recsorder            = 2:3;
@@ -189,7 +183,6 @@ else
             
         case 8
             
-            subjectdata.name                = 'LL';
             subjectdata.drug                = 'atomoxetine';
             
             subjectdata.session(1).recsorder            = [2 3];
@@ -209,7 +202,6 @@ else
             
         case 9
             
-            subjectdata.name                = 'MM';
             subjectdata.drug                = 'placebo';
             
             subjectdata.session(1).recsorder            = [2 3];
@@ -240,7 +232,6 @@ else
             
         case 11
             
-            subjectdata.name                = 'KM';
             subjectdata.drug                = 'atomoxetine';
             
             subjectdata.session(1).recsorder            = [2 3 4];
@@ -255,7 +246,6 @@ else
             
         case 12
             
-            subjectdata.name                = 'LP';
             subjectdata.drug                = 'placebo';
             
             subjectdata.session(1).recsorder            = [4 5];
@@ -290,7 +280,6 @@ else
             
         case 14
             
-            subjectdata.name                 = 'HH';
             subjectdata.drug                 = 'atomoxetine';
             
             subjectdata.session(1).recsorder            = [2 3];
@@ -306,7 +295,6 @@ else
             
         case 15
             
-            subjectdata.name                 = 'SB';
             subjectdata.drug                 = 'placebo';
             
             subjectdata.session(1).recsorder            = [3 4 5];
@@ -324,7 +312,6 @@ else
             
             % weird subject with loads of movement and artefacts
             % throw out!
-            subjectdata.name                 = 'BB';
             subjectdata.drug                 = 'donepezil';
             
             subjectdata.session(1).recsorder            = [2 3 4];
@@ -342,7 +329,6 @@ else
             
         case 17
             
-            subjectdata.name                 = 'MG';
             subjectdata.drug                 = 'atomoxetine';
             
             subjectdata.session(1).recsorder            = [2 3 4];
@@ -358,7 +344,6 @@ else
             
         case 18
             
-            subjectdata.name                 = 'WF';
             subjectdata.drug                 = 'placebo';
             
             subjectdata.session(1).recsorder            = [2 3 4];
@@ -374,7 +359,6 @@ else
             
         case 19
             
-            subjectdata.name                 = 'NS';
             subjectdata.drug                 = 'donepezil';
             
             subjectdata.session(1).recsorder            = [2 3 4];
@@ -390,7 +374,6 @@ else
             
         case 20
             
-            subjectdata.name                 = 'HR';
             subjectdata.drug                 = 'atomoxetine';
             
             subjectdata.session(1).recsorder            = [2 3 4];
@@ -407,7 +390,6 @@ else
             
         case 21
             
-            subjectdata.name                 = 'AE';
             subjectdata.drug                 = 'placebo';
             
             subjectdata.session(1).recsorder            = 6;
@@ -421,7 +403,6 @@ else
             
         case 22
             
-            subjectdata.name                  = 'MT';
             subjectdata.drug                  = 'donepezil';
             
             subjectdata.session(1).recsorder            = [2 3 4];
@@ -438,7 +419,6 @@ else
             
         case 23
             
-            subjectdata.name                  = 'FG';
             subjectdata.drug                  = 'placebo';
             
             subjectdata.session(1).recsorder            = [2 3 4];
@@ -455,7 +435,6 @@ else
             
         case 24
             
-            subjectdata.name                = 'SP';
             subjectdata.drug                = 'atomoxetine';
             
             subjectdata.session(1).recsorder            = [2 3 4];
@@ -473,7 +452,6 @@ else
             
         case 25
             
-            subjectdata.name                = 'LD';
             subjectdata.drug                = 'donepezil';
             
             subjectdata.session(1).recsorder            = [2 3 4];
@@ -489,7 +467,6 @@ else
             
         case 26
             
-            subjectdata.name                = 'CK';
             subjectdata.drug                = 'placebo';
             
             subjectdata.session(1).recsorder            = [2 3 4 5];
@@ -507,7 +484,6 @@ else
             
         case 27
             
-            subjectdata.name                = 'TA';
             subjectdata.drug                = 'atomoxetine';
             
             subjectdata.session(1).recsorder            = 2:7;
@@ -528,7 +504,6 @@ else
             
         case 28
             
-            subjectdata.name                    = 'MB';
             subjectdata.drug                    = 'donepezil';
             
             subjectdata.session(1).recsorder            = 2:6;
@@ -548,7 +523,6 @@ else
             
         case 29
             
-            subjectdata.name                    = 'TS';
             subjectdata.drug                    = 'placebo';
             
             subjectdata.session(1).recsorder            = 2:4;
@@ -565,7 +539,6 @@ else
             
         case 30
             
-            subjectdata.name                    = 'SW';
             subjectdata.drug                    = 'atomoxetine';
             
             subjectdata.session(1).recsorder            = 2:5;
@@ -585,7 +558,6 @@ else
             
         case 31
             
-            subjectdata.name                    = 'KR';
             subjectdata.drug                    = 'donepezil';
             
             subjectdata.session(1).recsorder            = 2:4;
@@ -602,7 +574,6 @@ else
             
         case 32
             
-            subjectdata.name                    = 'LZ';
             subjectdata.drug                    = 'placebo';
             
             subjectdata.session(1).recsorder            = 3:6;
@@ -620,7 +591,6 @@ else
             
         case 33
             
-            subjectdata.name 					= 'LB';
             subjectdata.drug 					= 'atomoxetine';
             
             subjectdata.session(1).recsorder            = 2:4;
@@ -637,7 +607,6 @@ else
             
         case 34
             
-            subjectdata.name                    = 'OW';
             subjectdata.drug                    = 'donepezil';
             
             subjectdata.session(1).recsorder            = 2:4;
@@ -654,7 +623,6 @@ else
             
         case 35
             
-            subjectdata.name                    = 'MA';
             subjectdata.drug                    = 'placebo';
             
             subjectdata.session(1).recsorder            = 2:4;
@@ -674,7 +642,6 @@ else
             
         case 36
             
-            subjectdata.name                    = 'MkA';
             subjectdata.drug                    = 'atomoxetine';
             
             subjectdata.session(1).recsorder            = 2:4;
@@ -692,7 +659,6 @@ else
             
         case 37
             
-            subjectdata.name                    = 'AE';
             subjectdata.drug                    = 'donepezil';
             
             subjectdata.session(1).recsorder            = 2:4;
@@ -705,7 +671,6 @@ else
             
         case 38
             
-            subjectdata.name                    = 'YP';
             subjectdata.drug                    = 'placebo';
             
             subjectdata.session(1).recsorder            = 2:4;
@@ -723,7 +688,6 @@ else
             
         case 39
             
-            subjectdata.name                    = 'NF';
             subjectdata.drug                    = 'atomoxetine';
             
             subjectdata.session(1).recsorder            = 2:5;
@@ -742,7 +706,6 @@ else
             
         case 40
             
-            subjectdata.name                    = 'LK';
             subjectdata.drug                    = 'donepezil';
             
             subjectdata.session(1).recsorder            = 2:4;
@@ -758,7 +721,6 @@ else
             
         case 41
             
-            subjectdata.name                    = 'AL';
             subjectdata.drug                    = 'placebo';
             
             subjectdata.session(1).recsorder            = 2:4;
@@ -774,7 +736,6 @@ else
             
         case 42
             
-            subjectdata.name                    = 'FA';
             subjectdata.drug                    = 'atomoxetine';
             
             subjectdata.session(1).recsorder            = 2:4;
@@ -791,7 +752,6 @@ else
             
         case 43
             
-            subjectdata.name                    = 'DR';
             subjectdata.drug                    = 'donepezil';
             
             subjectdata.session(1).recsorder            = 2:5;
@@ -809,7 +769,6 @@ else
             
         case 44
             
-            subjectdata.name                    = 'MS';
             subjectdata.drug                    = 'placebo';
             
             subjectdata.session(1).recsorder            = 2:5;
@@ -827,7 +786,6 @@ else
             
         case 45
             
-            subjectdata.name                    = 'JR';
             subjectdata.drug                    = 'atomoxetine';
             
             subjectdata.session(1).recsorder            = 2:4;
@@ -843,7 +801,6 @@ else
             
         case 46
             
-            subjectdata.name                    = 'AH';
             subjectdata.drug                    = 'donepezil';
             
             subjectdata.session(1).recsorder            = 2:4;
@@ -860,7 +817,6 @@ else
             
         case 47
             
-            subjectdata.name                    = 'JR';
             subjectdata.drug                    = 'placebo';
             
             subjectdata.session(1).recsorder            = 2:3;
@@ -875,7 +831,6 @@ else
             
         case 48
             
-            subjectdata.name                    = 'JH';
             subjectdata.drug                    = 'atomoxetine';
             
             subjectdata.session(1).recsorder            = 2:3;
@@ -891,7 +846,6 @@ else
             
         case 49
             
-            subjectdata.name                    = 'AM';
             subjectdata.drug                    = 'donepezil';
             
             subjectdata.session(1).recsorder            = 2:4;
@@ -907,7 +861,6 @@ else
             
         case 50
             
-            subjectdata.name                    = 'SS';
             subjectdata.drug                    = 'placebo';
             
             subjectdata.session(1).recsorder            = 2:3;
@@ -922,7 +875,6 @@ else
             
         case 51
             
-            subjectdata.name                    = 'MS';
             subjectdata.drug                    = 'atomoxetine';
             
             subjectdata.session(1).recsorder            = 2:4;
@@ -939,7 +891,6 @@ else
             
         case 52
             
-            subjectdata.name                    = 'MH';
             subjectdata.drug                    = 'donepezil';
             
             subjectdata.session(1).recsorder            = 2:4;
@@ -955,7 +906,6 @@ else
             
         case 53
             
-            subjectdata.name                    = 'ACW';
             subjectdata.drug                    = 'placebo';
             
             subjectdata.session(1).recsorder            = 2:3;
@@ -970,7 +920,6 @@ else
             
         case 54
             
-            subjectdata.name                    = 'MS';
             subjectdata.drug                    = 'atomoxetine';
             
             subjectdata.session(1).recsorder            = [2 3 4 5 6];
@@ -991,7 +940,6 @@ else
             
         case 55
             
-            subjectdata.name                    = 'EI';
             subjectdata.drug                    = 'donepezil';
             
             subjectdata.session(1).recsorder            = 2:4;
@@ -1008,7 +956,6 @@ else
             
         case 56
             
-            subjectdata.name                    = 'JH';
             subjectdata.drug                    = 'placebo';
             
             subjectdata.session(1).recsorder            = 2:5;
@@ -1026,7 +973,6 @@ else
             
         case 57
             
-            subjectdata.name                    = 'HE';
             subjectdata.drug                    = 'atomoxetine';
             
             subjectdata.session(1).recsorder            = 2:5;
@@ -1045,7 +991,6 @@ else
             
         case 58
             
-            subjectdata.name                    = 'BK';
             subjectdata.drug                    = 'donepezil';
             
             subjectdata.session(1).recsorder            = 2:4;
@@ -1067,7 +1012,6 @@ else
             
         case 59
             
-            subjectdata.name                    = 'RO';
             subjectdata.drug                    = 'placebo';
             
             subjectdata.session(1).recsorder            = 2:7;
@@ -1089,7 +1033,6 @@ else
             
         case 60
             
-            subjectdata.name                    = 'DL';
             subjectdata.drug                    = 'atomoxetine';
             
             subjectdata.session(1).recsorder            = 3:4;
@@ -1105,7 +1048,6 @@ else
             
         case 61
             
-            subjectdata.name                    = 'RW';
             subjectdata.drug                    = 'atomoxetine';
             
             subjectdata.session(1).recsorder            = 2:3;
@@ -1120,7 +1062,6 @@ else
             
         case 62
             
-            subjectdata.name                    = 'FZ';
             subjectdata.drug                    = 'donepezil';
             
             subjectdata.session(1).recsorder            = 2:7;
@@ -1141,7 +1082,6 @@ else
             
         case 63
             
-            subjectdata.name                    = 'HJ';
             subjectdata.drug                    = 'atomoxetine';
             
             subjectdata.session(1).recsorder            = 2:4;
@@ -1160,7 +1100,6 @@ else
             
         case 64
             
-            subjectdata.name                    = 'SE';
             subjectdata.drug                    = 'donepezil';
             
             subjectdata.session(1).recsorder            = 2:4;
@@ -1176,7 +1115,6 @@ else
             
         case 65
             
-            subjectdata.name                    = 'UR';
             subjectdata.drug                    = 'atomoxetine';
             
             subjectdata.session(1).recsorder            = 2:4;
@@ -1194,6 +1132,7 @@ else
     
     % ====================================================================================== %
     % for each recording, get the name of the corresponding CTF dataset
+    % this only works on the UKE cluster
     % ====================================================================================== %
     
     if isnumeric(sj),
@@ -1211,7 +1150,8 @@ else
     
     % =========================================== %
     % DATA FROM TABLE, copied from Excel
-    % done by Eline
+    % these data (gender, weight, age etc) can be requested 
+    % from Anne Urai
     % =========================================== %
     try
         t = readtable('tableSubjectData.csv');
@@ -1221,7 +1161,7 @@ else
             subjectdata.(flds{f})      = t.(flds{f})(find(t.sj == sj));
         end
         
-        % heartrate, entered by Sven
+        % heartrate
         for session = 1:length(subjectdata.session),
             subjectdata.session(session).heartrate = [t.(['Heartrate_S' num2str(session) '_1'])(find(t.sj == sj))...
                 t.(['Heartrate_S' num2str(session) '_2'])(find(t.sj == sj))];
