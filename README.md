@@ -1,13 +1,15 @@
 Urai &amp; Donner (2022). Persistent Activity in Human Parietal Cortex Mediates Perceptual Choice Repetition Bias. _bioRxiv_, https://doi.org/10.1101/2021.10.09.463755
 
-This script shows the order of running MEG analyses to reproduce the analyses and generate figures. If you use this code, please cite the paper.
+This script shows the order of running MEG analyses to reproduce the analyses and generate figures. 
+If you use this code, please cite the paper.
 
 Anne Urai, Leiden University, 2022
 a.e.urai@fsw.leidenuniv.nl
 
 
 # Data #
-Processed (ROI-extracted) data can be found at https://osf.io/v3r52/. 
+
+Processed (ROI-extracted) data can be found at https://osf.io/v3r52/. Their format is explained [here](https://github.com/anne-urai/2022_Urai_choicehistory_MEG/tree/main/Data_description.md).
 
 Unfortunately, the raw data cannot be shared due to our consent form used at the time of data collection, and privacy regulations at our institutes. Please contact Anne Urai for access.
 
@@ -30,14 +32,17 @@ subjectdata = subjectspecifics('GA');
 for sj = subjectdata.all, preproc_readMEG(sj); end % read in all MEG files
 for sj = subjectdata.all, preproc_cleanUp(sj); end % reject trials + write clean csv file
 for sj = subjectdata.all, preproc_appendRecs(sj); end % append within each session
-for sj = subjectdata.clean, preproc_redefineFiles(sj); end % epoch into ref, stim, resp and fb
-
 ```
 
 ### Create behavioral summary file ###
 ``` matlab
 preproc_writeCSV; % write csv data from MEG, only behavior info
 % the exclusion of 1 bad subjects is incorporated into subjectspecifics.m
+```
+
+### Epoch trials ###
+```matlab
+for sj = subjectdata.clean, preproc_redefineFiles(sj); end % into ref, stim, resp and fb
 ```
 
 ### Preprocess for TFR sensor-level plots ###
@@ -50,11 +55,12 @@ for n = 1:25, tfr_grandAverage(n, 1:2, 1, 1, 1); end % do grand average across E
 ```
 
 ### Plot TFRs at the sensor level ###
+
 ``` matlab
-for n = 2:7,sensorplot_clusterStatsTFR_defineSens(n); end % cluster-based statistics 
+for n = 2:7,sensorplot_clusterStatsTFR_defineSens(n); end
 sensorplot_sensordefinition;
-for n = 2:7, sensorplot_clusterStatsTFR_forTFR(n); end % cluster-based statistics
-sensorplot_plotTFR('GAclean'); % plot a whole set of TFR figures for different contrasts
+for n = 2:7, sensorplot_clusterStatsTFR_forTFR(n); end
+sensorplot_plotTFR('GAclean');
 ```
 
 ### Evoked vs. Induced activity ###
@@ -78,9 +84,9 @@ for sj = subjectdata.clean, dics_beamformer; end % beamforms for each epoch and 
 
 ### Parcellate into ROIs ###
 ``` matlab
-dics_atlases; % define ROIs based on a few atlases; this will also output the inflated cortex with the maps on top
+dics_atlases; % this will also output the inflated cortex with the maps on top
 for sj = subjecdata.clean, dics_parcellate; end
-dics_grandaverage; % create one large file to work with + lateralize
+dics_grandaverage; # create one large file to work with + lateralize
 ```
 
 After this, parcellated files can be copied and the rest of the analyses can be run locally.
@@ -128,10 +134,10 @@ dics_singletrial_writecsv; % the last script will also write a csv file for HDDM
 ### Plot GLME history effects ###
 ```matlab
 dics_scalars_stats; % all panels across areas in figures 2 and 3
-dics_stats_print_summary; % print some stats that go into the manuscript
+dics_stats_print_summary;
 dics_stats_groupdiff; % figure 4, between-subject correlations and group effects
-dics_scalars_stats_multitrial; % multi-trial regression weights
-dics_plot_effect_timecourses; % within-trial regression weights
+dics_scalars_stats_multitrial;
+dics_plot_effect_timecourses;
 ```
 
 ## Behavior ##
@@ -140,7 +146,7 @@ History kernels from Fruend code. This only runs locally in `python2.7`, unfortu
 ``` python
 behavior_plots.py # figure 1
 behavior_kernels_fit.py # for supplementary figure
-behavior_multitrial.py # multi-trial streak analysis
+behavior_multitrial.py
 ```
 
 ### Mediation analyses in R, plotting in Python ###
