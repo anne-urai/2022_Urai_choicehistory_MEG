@@ -118,10 +118,10 @@ for f = 1:3; %length(freqs),
     end
     
     % TAKE EXACT THE SAME TIMEBINS AS IN THE OTHER SCRIPT
-    %timewins(1).name        = 'pre_ref_time';
-    %timewins(1).samples     = 1:8; % pre-reference fixation to 50ms after reference onset
-    timewins(1).name         = 'prestim';
-    timewins(1).samples      = 29:36; % pre-stimulus fixation to 50ms after stimulus onset
+    timewins(1).name         = 'preref';
+    timewins(1).samples      = 1:8; % pre-reference fixation to 50ms after reference onset
+    timewins(end+1).name     = 'prestim';
+    timewins(end).samples    = 29:36; % pre-stimulus fixation to 50ms after stimulus onset
     timewins(end+1).name     = 'ref';
     timewins(end).samples    = 7:22; % 0-750 ms after reference onset
     timewins(end+1).name     = 'stim';
@@ -130,11 +130,11 @@ for f = 1:3; %length(freqs),
     %timewins(end).samples   = 1:55; % reference to end of stimulus
     
     for tw = 1:length(timewins),
-        % 1. pre-reference stimulus response
-        pre_ref_time = timewins(tw).samples; % pre-reference fixation to 50ms after reference onset
-        pre_ref = squeeze(nanmean(source.pow(:, :, pre_ref_time), 3));
+        % pull out the power values
+        this_time = timewins(tw).samples; % pre-reference fixation to 50ms after reference onset
+        this_pow = squeeze(nanmean(source.pow(:, :, this_time), 3));
         for i = 1:length(source.label),
-            sourcescalars.(freqs(f).name).(timewins(tw).name).(source.label{i}) = pre_ref(i, :)';
+            sourcescalars.(freqs(f).name).(timewins(tw).name).(source.label{i}) = this_pow(i, :)';
         end
         if ~istable(sourcescalars.(freqs(f).name).(timewins(tw).name)),
             sourcescalars.(freqs(f).name).(timewins(tw).name) = struct2table(sourcescalars.(freqs(f).name).(timewins(tw).name));

@@ -85,23 +85,29 @@ signific_freqs = mean(usefreqs, 2) > 0.5;
 
 close all;
 ytick = [0:20:120];
-%colors = cbrewer('seq', 'Greens', 5);
-colors = inferno(10);
-set(gcf,'defaultAxesColorOrder', [colors(6, :); colors(6, :)]);
+colors = cbrewer('seq', 'Greens', 5);
+% colors = inferno(10);
+set(gcf,'defaultAxesColorOrder', [colors(5, :); colors(5, :)]);
 
 subplot(221); hold on;
+[~, ~, ci, ~] = ttest(powspctrm_evoked);
+ci =  ci(1, :) - mean(powspctrm_evoked);
 
-boundedline(grandavg.freq, nanmean(powspctrm_evoked), nanstd(powspctrm_evoked) ./ sqrt(60), 'alpha', 'cmap', [ 0 0 0]);
+boundedline(grandavg.freq, nanmean(powspctrm_evoked), ci, ...
+    'alpha', 'cmap', [ 0 0 0]);
 axis tight; xlim([xlm]);
 ylabel('Evoked power (\Delta%)');
 set(gca, 'ytick', [-2, 0, 2], 'ylim', [-2 2], 'xtick', ytick, 'xminortick', 'on');
 
 yyaxis right;
-boundedline(grandavg.freq, nanmean(powspctrm_induced), nanstd(powspctrm_induced) ./ sqrt(60), 'alpha', 'cmap', colors(6, :));
+[~, ~, ci, ~] = ttest(powspctrm_induced);
+ci =  ci(1, :) - mean(powspctrm_induced);
+
+boundedline(grandavg.freq, nanmean(powspctrm_induced), ci, 'alpha', 'cmap', colors(5, :));
 % indicate when the contrast is significant
 mn_pow = nanmean(powspctrm_induced);
 mn_pow(~signific_freqs) = nan;
-plot(grandavg.freq, mn_pow, '.', 'color', colors(6, :));
+plot(grandavg.freq, mn_pow, '.', 'color', colors(5, :));
 
 ylabel('Total power (\Delta%)');
 freqidx = find(grandavg.freq >= 65 & grandavg.freq <= 95);

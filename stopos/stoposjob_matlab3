@@ -1,0 +1,21 @@
+#!/bin/bash
+
+#SBATCH -t 2-00:00:00 # maximum 5 days on cartesius
+#SBATCH -n 1
+#SBATCH -o /home/aeurai/jobs/slurm-%A_%a.out
+#SBATCH -e /home/aeurai/jobs/slurm-%A_%a.err
+#SBATCH --mail-user=anne.urai@gmail.com # mail when done
+#SBATCH --mail-type=END,FAIL # mail when done
+
+# load necessary modules
+# module load surf-devel
+module load pre2019
+module load matlab/r2017b
+
+date # display date and time
+
+# ONE JOB THAT CALLS STUFF
+matlab -nodesktop -nodisplay -r "disp(pwd); dics_effects(0, 3, 0); exit"
+matlab -nodesktop -nodisplay -r "disp(pwd); dics_effects(0, 3, 1); exit"
+
+date # display date and time

@@ -421,6 +421,7 @@ end
 function clusters = get_clusters_glasser(lateralized)
 
 % LIST ALL CLUSTERS https://github.com/DonnerLab/pymeg/blob/master/pymeg/atlas_glasser.py#L287
+% See also https://static-content.springer.com/esm/art%3A10.1038%2Fnature18933/MediaObjects/41586_2016_BFnature18933_MOESM330_ESM.pdf
 
 clusters(1).name            = 'visual_primary';
 clusters(1).regions         = {'V1'};
@@ -439,6 +440,11 @@ clusters(end).regions       = {'4', '3a', '3b', '1', '2'};
 
 clusters(end+1).name        = 'paracentral_midcingulate';
 clusters(end).regions       = {'24dd', '24dv', '6mp', '6ma', '5m', '5L', '5mv', '33pr', 'p24pr'};
+
+% email Tobi, december 2021
+% o	Dorsal: 6a, 6d
+% o	Intermediate / ?eye fields": FEF, PEF, 55b (again: here ?FEF? refers to Glasser-FEF, not Wang-FEF!)
+% o	Ventral: 6v, 6r
 
 clusters(end+1).name        = 'PMd/v';
 clusters(end).regions       = {'55b', '6d', '6a', 'FEF', '6v', '6r', 'PEF'};

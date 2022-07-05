@@ -3,11 +3,11 @@ function dics_plot_timecourses(sessions, vs, sjgr)
 close all;
 set(groot, 'DefaultFigureWindowStyle','normal');
 
-if ~exist('sessions', 'var'), sessions = [0, 1:2]; end
+if ~exist('sessions', 'var'), sessions = [0]; end
 if ischar(sessions),          sessions = str2double(sessions); end
 
 freqs                         = dics_freqbands; % retrieve specifications
-if ~exist('vs', 'var'),       vs = 1:3; end
+if ~exist('vs', 'var'),       vs = 2:3; end
 if ischar(vs),                vs = str2double(vs); end
 
 if ~exist('sjgr', 'var'),     sjgr = 1; end % for all sjs together
@@ -17,7 +17,7 @@ sjdat = subjectspecifics('ga');
 
 % choose some more settings
 
-sjgroups = {'all', 'repeaters', 'alternators'};
+sjgroups = {'all'};
 group = sjgroups{sjgr}; % only run once, don't loop
 fz = 7;
 set(groot, 'defaultaxesfontsize', fz, ...
@@ -152,20 +152,30 @@ for session = sessions,
         %             find(~cellfun(@isempty, regexp(source.label, '\w*wang_vfc\w*')))'];
         %         userois = 1:length(source.label); % use all
         
-        useroi_names = {'wang_vfc_V1';'wang_vfc_V2-V4';'wang_vfc_VO1/2';'wang_vfc_PHC';'wang_vfc_V3A/B'; ...
-            'wang_vfc_MT/MST';'wang_vfc_LO1/2';'wang_vfc_IPS0/1';'wang_vfc_IPS2/3';'wang_vfc_IPS4/5'; ...
-            'wang_vfc_SPL1';'wang_vfc_FEF'; 'aeu_symm_M1';'aeu_symm_aIPS'; ...
-            'jwg_symm_aIPS';'jwg_symm_IPSPCeS';'jwg_symm_M1'; ...
-            'aeu_M1_lateralized';'aeu_PreCeS_lateralized';'aeu_aIPS_lateralized'; ...
-            'jwg_aIPS_lateralized';'jwg_IPS_PCeS_lateralized';'jwg_M1_lateralized'};
-        useroi_names = {'wang_vfc_V3A/B', 'wang_vfc_MT/MST', 'jwg_M1_lateralized'};
-        useroi_names = {'jwg_M1_lateralized'};
+        %         useroi_names = {'wang_vfc_V1';'wang_vfc_V2-V4';'wang_vfc_VO1/2';'wang_vfc_PHC';'wang_vfc_V3A/B'; ...
+        %             'wang_vfc_MT/MST';'wang_vfc_LO1/2';'wang_vfc_IPS0/1';'wang_vfc_IPS2/3';'wang_vfc_IPS4/5'; ...
+        %             'wang_vfc_SPL1';'wang_vfc_FEF'; 'aeu_symm_M1';'aeu_symm_aIPS'; ...
+        %             'jwg_symm_aIPS';'jwg_symm_IPSPCeS';'jwg_symm_M1'; ...
+        %             'aeu_M1_lateralized';'aeu_PreCeS_lateralized';'aeu_aIPS_lateralized'; ...
+        %             'jwg_aIPS_lateralized';'jwg_IPS_PCeS_lateralized';'jwg_M1_lateralized'};
+        %         useroi_names = {'wang_vfc_V3A/B', 'jwg_M1_lateralized'}; %, 'wang_vfc_MT/MST', 'jwg_M1_lateralized'};
+        %         % useroi_names = {'jwg_M1_lateralized'};
+        %
+        switch v
+            case 3
+                useroi_names = {'wang_vfc_V3A/B'};
+                use_contrasts = 1;
+            case 2
+                useroi_names = {'jwg_M1_lateralized'};
+                use_contrasts = 3;
+            case 1
+                useroi_names = {''}; % skip alpha
+        end
         userois = find(ismember(source.label, useroi_names))';
         disp(source.label(userois));
         
         for r = userois,
-            for c = [3], % 5 4
-                
+            for c = use_contrasts
                 if c > 7 & sjgr > 1,
                     continue;
                 end
@@ -194,29 +204,42 @@ for session = sessions,
                 end
                 
                 % stats - cluster-based permutation correction
-                [h1, pval1] = ttest_clustercorr(tmp_contrast_1);
+                [h1, pval1, stat1] = ttest_clustercorr(tmp_contrast_1);
+                [~, ~, ci1, ~] = ttest(tmp_contrast_1);
+                ci1 = ci1(1, :) - mean(tmp_contrast_1);
+                
                 [h2, pval2] = ttest_clustercorr(tmp_contrast_2);
+                [~, ~, ci2, ~] = ttest(tmp_contrast_2);
+                ci2 = ci2(1, :) - mean(tmp_contrast_2);
+                
                 [h3, pval3] = ttest_clustercorr(tmp_contrast_1, tmp_contrast_2);
                 
                 % =========================================== %
-                % PLOT
+                %% PLOT
                 % =========================================== %
                 
                 close all;
                 if c == 1,
-                    subplot(5,2,[1 2 3]); hold on;
+                    %subplot(5,2,[1 2 3]);
+                    subplot(5,8,[1 2 3]);
                 elseif c == 3,
-                    subplot(5,4,[1 2]); hold on;
+                    % subplot(5,4,[1 2]);
+                    subplot(5,8,[1 2 3 4]);
                 end
-                cmap = inferno(10);
-                cmap = cmap([6 8], :);
+                hold on;
+                
+                % pick a nice colormap
+                %cmap = inferno(10);
+                %cmap = cmap([6 8], :);
+                cmap = cbrewer('seq', 'YlGnBu', 7);
+                cmap = cmap([6 4], :);
                 
                 % THEN THE DATA ON TOP
                 boundedline(1:length(timeidx), mean(tmpdat(contrasts(c).tid{:, 2} == 1, :)), ...
-                    std(tmpdat(contrasts(c).tid{:, 2} == 1, :)) / sqrt(sum(contrasts(c).tid{:, 2} == 1)), ...
+                    ci1, ...
                     'nan', 'gap', 'cmap', cmap(1, :), 'alpha');
                 boundedline(1:length(timeidx), mean(tmpdat(contrasts(c).tid{:, 2} == -1, :)), ...
-                    std(tmpdat(contrasts(c).tid{:, 2} == -1, :)) / sqrt(sum(contrasts(c).tid{:, 2} == -1)), ...
+                    ci2, ...
                     'nan', 'gap', 'cmap', cmap(end, :), 'alpha');
                 
                 axis tight;
@@ -253,7 +276,7 @@ for session = sessions,
                 print(gcf, '-dpdf', sprintf('%s/dics_timecourse_c%d_%s_%s.pdf', sjdat.figsdir, ...
                     c, freqs(v).name, regexprep(source.label{r}, '/', '')));
                 
-                % ===========================================
+                %% ===========================================
                 
             end % contrast
         end % roi

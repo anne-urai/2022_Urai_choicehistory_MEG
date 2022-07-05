@@ -1,0 +1,37 @@
+#!/bin/bash
+
+
+# submit using hddm_submit 0 1 2 ...
+# where each model number should correspond to a name in hddm_fit.py
+
+# clear the params file a the start
+: > params_hddm
+
+# now write a file with all the models and trace_idx
+for md in "$@"
+do
+	for i in {0..14}
+	do
+		for d in {0..0}
+		do
+  			echo "$md" "$i" "$d" >> params_hddm
+  		done
+	done
+done
+
+# add to stopos
+module load 2021
+module load Stopos/0.93-GCC-10.3.0
+# stopos create
+stopos add params_hddm -p pool
+
+# submit as many jobs as necessary
+n=$(< params_hddm wc -l)
+n=$((n / 15))
+
+echo 'number of jobs to submit: ' $n
+sbatch --array=1-"$n" hddm_lisajob
+
+# show the status of my queue
+sleep 2
+squeue -u aeurai
