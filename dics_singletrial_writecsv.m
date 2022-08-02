@@ -22,6 +22,8 @@ roinames = {'v1_lat', 'v2v4_lat', 'mtmst_lat', 'v3ab_lat', 'ips01_lat', ...
     'pces', 'pmdv', 'm1'};
     
 freqs = dics_freqbands; % retrieve specifications
+
+%% ==
 for f = 1:3; %length(freqs),
     
     % =========================================== %
@@ -29,49 +31,6 @@ for f = 1:3; %length(freqs),
     % =========================================== %
     
     tab = readtable(sprintf('%s/allsubjects_meg.csv', sjdat.csvdir));
-    
-    % ADD SOME HISTORY VARS
-    tab.prev_stim     = circshift(tab.stimulus, 1);
-    tab.prev_hand     = -1 * sign(circshift(tab.hand, 1) - 15); % dont do this yet...
-    tab.prev_hand     = circshift(tab.hand, 1);
-    tab.prev_resp     = circshift(tab.response, 1);
-    tab.repeat        = 1 * (tab.prev_resp == tab.response);
-    % tab.repeat(tab.repeat == 0) = -1; % to allow for the same coding as other vars
-    
-    % code for previous reward too
-    tab.prev_correct  = circshift(tab.correct, 1);
-    tab.prevresp_correct = tab.prev_resp;
-    tab.prevresp_correct(tab.prev_correct == 0) = 0;
-    tab.prevresp_error = tab.prev_resp;
-    tab.prevresp_error(tab.prev_correct == 1) = 0;
-    assert(isequaln(tab.prevresp_correct + tab.prevresp_error, tab.prev_resp));
-    
-    % remove for trials that are not continuous
-    wrongtrl          = (tab.trial ~= circshift(tab.trial, 1) + 1);
-    tab{wrongtrl, {'prev_stim', 'prev_resp', 'prev_hand', 'repeat', 'prev_correct'}} = nan;
-    
-    % =========================================== %
-    % repetition index: color
-    % =========================================== %
-    
-    [g, perf] = findgroups(tab(:, {'subj_idx'}));
-    [perf.repeat] = splitapply(@nanmean, tab.repeat, g);
-    
-    colors = cbrewer('div', 'PuOr', 256);
-    colors(128-40:128+40, :) = []; % remove white in the middle
-    colors = colors + 0.1; % make a bit paler
-    colors(colors > 1) = 1;
-    colspace =  linspace(0.2, 0.8, size(colors, 1));
-    sjs = sjdat.clean;
-    sjs(sjs == 0) = [];
-    
-    tab.repetition = nan(size(tab.subj_idx));
-    for sj = 1:length(sjs),
-        colidx          = dsearchn(colspace', unique(perf.repeat(perf.subj_idx == sjs(sj))));
-        mycolmap(sj, :) = colors(colidx, :);
-        tab.repetition(tab.subj_idx == sjs(sj)) = perf.repeat(perf.subj_idx == sjs(sj));
-    end
-    tab.group = (tab.repetition > 0.5);
     
     % =========================================== %
     % GET PARCELLATED DATA FROM ALL SUBJECTS
@@ -118,10 +77,10 @@ for f = 1:3; %length(freqs),
     end
     
     % TAKE EXACT THE SAME TIMEBINS AS IN THE OTHER SCRIPT
-    %timewins(1).name        = 'pre_ref_time';
-    %timewins(1).samples     = 1:8; % pre-reference fixation to 50ms after reference onset
-    timewins(1).name         = 'prestim';
-    timewins(1).samples      = 29:36; % pre-stimulus fixation to 50ms after stimulus onset
+    timewins(1).name         = 'preref';
+    timewins(1).samples      = 1:8; % pre-reference fixation to 50ms after reference onset
+    timewins(end+1).name     = 'prestim';
+    timewins(end).samples    = 29:36; % pre-stimulus fixation to 50ms after stimulus onset
     timewins(end+1).name     = 'ref';
     timewins(end).samples    = 7:22; % 0-750 ms after reference onset
     timewins(end+1).name     = 'stim';
@@ -130,11 +89,11 @@ for f = 1:3; %length(freqs),
     %timewins(end).samples   = 1:55; % reference to end of stimulus
     
     for tw = 1:length(timewins),
-        % 1. pre-reference stimulus response
-        pre_ref_time = timewins(tw).samples; % pre-reference fixation to 50ms after reference onset
-        pre_ref = squeeze(nanmean(source.pow(:, :, pre_ref_time), 3));
+        % pull out the power values
+        this_time = timewins(tw).samples; % pre-reference fixation to 50ms after reference onset
+        this_pow = squeeze(nanmean(source.pow(:, :, this_time), 3));
         for i = 1:length(source.label),
-            sourcescalars.(freqs(f).name).(timewins(tw).name).(source.label{i}) = pre_ref(i, :)';
+            sourcescalars.(freqs(f).name).(timewins(tw).name).(source.label{i}) = this_pow(i, :)';
         end
         if ~istable(sourcescalars.(freqs(f).name).(timewins(tw).name)),
             sourcescalars.(freqs(f).name).(timewins(tw).name) = struct2table(sourcescalars.(freqs(f).name).(timewins(tw).name));
@@ -143,34 +102,34 @@ for f = 1:3; %length(freqs),
     
     % =========================================== %
     % map table idx to MEG idx
+    % change: keep all trials and fill with nans
     % =========================================== %
     
-    [~, ~, tidx]    = intersect(sourcescalars.trialinfo(:, 18), tab.idx, 'stable');
-    assert(size(sourcescalars.trialinfo, 1) == length(tidx));
-    tab             = tab(tidx, :); % keep only that part of the table
-    assert(isequal(tab.idx, sourcescalars.trialinfo(:, 18)), 'idx do not match');
+    %     [~, ~, tidx]    = intersect(sourcescalars.trialinfo(:, 18), tab.idx, 'stable');
+    %     assert(size(sourcescalars.trialinfo, 1) == length(tidx));
+    %     tab             = tab(tidx, :); % keep only that part of the table
+    %     assert(isequal(tab.idx, sourcescalars.trialinfo(:, 18)), 'idx do not match');
     
     for r = 1:length(userois),
         for tw = 1:length(timewins),
-            tab.neural = sourcescalars.(freqs(f).name).(timewins(tw).name).(regexprep(regexprep(userois{r}, '-', ''), '/', ''));
+            
+            neuraldat = sourcescalars.(freqs(f).name).(timewins(tw).name).(regexprep(regexprep(userois{r}, '-', ''), '/', ''));
             varname = sprintf('%s_%s_%swin', freqs(f).name, regexprep(roinames{r}, '/', ''), ...
                 regexprep(timewins(tw).name, '_', ''));
-            tab.(varname) = tab.neural;
+            
+            % where to put these?
+            [~, ~, tidx]    = intersect(sourcescalars.trialinfo(:, 18), tab.idx, 'stable');
+            % should be: 3 4 6 7 8 9
+            
+            % insert and leave the rest nan
+            tab.(varname) = nan(size(tab.idx));
+            tab{tidx, varname} = neuraldat;
         end
     end
     
     % ================================ %%
     % SAVE MEG VALUES FOR HDDM!
     % ================================ %%
-    
-    tab.prevresp = tab.prev_resp;
-    tab.prevstim = tab.prev_stim;
-    tab = removevars(tab, {'prev_resp', 'prev_stim', 'neural'});
-    
-    % remove rows with any nans, messes up HDDM
-    nans_idx = any(isnan(tab{:, :}), 2);
-    assert(mean(nans_idx) < 0.1, 'trying to remove too many nan trials');
-    tab(nans_idx, :) = [];
     
     writetable(tab, sprintf('%s/allsubjects_megall_4hddm_%s.csv', sjdat.csvdir, freqs(f).name));
     fprintf('%s/allsubjects_megall_4hddm_%s.csv \n', sjdat.csvdir, freqs(f).name);
@@ -179,22 +138,26 @@ end
 
 %% ================================ %%
 % CONCATENATE ACROSS DIFFERENT FREQS
-%% ================================ %%
+% ================================ %%
 
 for f = 1:3,
     tmptab = readtable(sprintf('%s/allsubjects_megall_4hddm_%s.csv', sjdat.csvdir, freqs(f).name));
     if f == 1,
         tabs = tmptab;
     else
-        tabs = join(tabs, tmptab, 'keys', ...
-            tmptab.Properties.VariableNames(~contains(tmptab.Properties.VariableNames, freqs(f).name)));
+        assert(isequal(tabs.idx, tmptab.idx));
+        varnames = tmptab.Properties.VariableNames(contains(tmptab.Properties.VariableNames, freqs(f).name));
+        varnames{end+1} = 'idx';
+        tabs = join(tabs, tmptab(:, varnames));
+%         tabs = join(tabs, tmptab, 'keys', ...
+%             tmptab.Properties.VariableNames(~contains(tmptab.Properties.VariableNames, freqs(f).name)));
     end
 end
 
 % FINAL CSV FOR HDDM FITTING
 writetable(tabs, sprintf('%s/allsubjects_megall_4hddm.csv', sjdat.csvdir));
 writetable(tabs, sprintf('%s/HDDM/allsubjects_megall_4hddm.csv', sjdat.path));
-fprintf('%s/allsubjects_meg_4hddm.csv \n', sjdat.csvdir)
+fprintf('%s/allsubjects_meg_4hddm.csv \n', sjdat.csvdir);
 
 %% ================================ %%
 % remove outliers and normalize
@@ -210,11 +173,11 @@ tabs = readtable(sprintf('%s/allsubjects_megall_4hddm.csv', sjdat.csvdir));
 
 % recode for binary outcomes
 tabs.response(tabs.response == -1) = 0;
-tabs.group(tabs.group == 0) = -1; % repeaters (1) vs alternators (-1)
+%tabs.group(tabs.group == 0) = -1; % repeaters (1) vs alternators (-1)
 
-% make sure all non-neural vars are at the start
+% make sure all non-neural vars are at the start for easier reading
 non_neural_vars = {'idx', 'keep_meg', 'subj_idx', 'session', 'block', 'trial', ...
-    'stimulus', 'hand', 'response', 'rt', 'correct', 'prev_hand', 'prevresp', 'prevstim', 'prev_correct', 'start_hand', ...
+    'stimulus', 'hand', 'response', 'rt', 'correct', 'prev_hand', 'prev_resp', 'prev_stim', 'prev_correct', 'start_hand', ...
     'repeat', 'repetition', 'group', 'prevresp_correct', 'prevresp_error'};
 neural_vars = setdiff(tabs.Properties.VariableNames, non_neural_vars);
 tabs = tabs(:, cat(2, non_neural_vars, neural_vars));
@@ -259,8 +222,9 @@ for sj = unique(tabs.subj_idx)',
             tabs.alpha_global(tabs.subj_idx == sj & tabs.session == sess));
     end
 end
+
 % show that the previous choice effect is still significant!
-glme = fitglme(tabs, 'alpha_ips01_stimwin_resid ~ 1 + stimulus + prevresp + (1 | subj_idx)')
+glme = fitglme(tabs, 'alpha_ips01_stimwin_resid ~ 1 + stimulus + prev_resp + (1 | subj_idx)')
 
 % ================================ %%
 % create a residual gamma signal
@@ -302,10 +266,9 @@ tabs.beta_2motor_lat_prestimwin = mean(tabs{:, avg_rois}, 2);
 avg_rois = {'beta_m1_lat_refwin', 'beta_pmdv_lat_refwin'};
 tabs.beta_2motor_lat_refwin = mean(tabs{:, avg_rois}, 2);
 
-% FINAL CSV FOR HDDM FITTING
-writetable(tabs, sprintf('%s/allsubjects_megall_4hddm_norm.csv', sjdat.csvdir));
-writetable(tabs, sprintf('%s/HDDM/allsubjects_megall_4hddm_norm.csv', sjdat.path));
-fprintf('%s/allsubjects_megall_4hddm_norm.csv \n', sjdat.csvdir);
+% writetable(tabs, sprintf('%s/allsubjects_megall_4hddm_norm.csv', sjdat.csvdir));
+% writetable(tabs, sprintf('%s/HDDM/allsubjects_megall_4hddm_norm.csv', sjdat.path));
+% fprintf('%s/allsubjects_megall_4hddm_norm.csv \n', sjdat.csvdir);
 
 % ================================ %%
 % another version of the same files, with motor lateralization signals
@@ -321,8 +284,49 @@ for c = 1:length(cols2flip),
     tabs{(tabs.handgroup == 1), cols2flip{c}} = -1 * tabs{(tabs.handgroup == 1), cols2flip{c}};
 end
 
-writetable(tabs, sprintf('%s/allsubjects_megall_4hddm_norm_flip.csv', sjdat.csvdir));
-writetable(tabs, sprintf('%s/HDDM/allsubjects_megall_4hddm_norm_flip.csv', sjdat.path));
-fprintf('%s/allsubjects_megall_4hddm_norm_flip.csv \n', sjdat.csvdir);
+writetable(tabs, sprintf('%s/allsubjects_meg_complete.csv', sjdat.csvdir));
+writetable(tabs, sprintf('%s/HDDM/allsubjects_meg_complete.csv', sjdat.path));
+fprintf('%s/allsubjects_meg_complete.csv \n', sjdat.csvdir);
+
+% ================================ %%
+% select only what we need for the HDDMnn (smaller file)
+% ================================ %%
+
+tabs.Properties.VariableNames{'prev_resp'} = 'prevresp';
+tabs.Properties.VariableNames{'prev_stim'} = 'prevstim';
+
+tabs2 = tabs(:,{'subj_idx', ...
+  'session', ...
+  'block', ...
+  'trial', ... 
+  'stimulus', ...
+  'hand', ...
+  'response', ...
+  'rt', ...
+  'correct', ...
+  'prevresp', ...
+  'prevstim', ...
+  'prev_correct', ...
+  'repeat', ...
+  'repetition', ...
+  'group', ...
+  'prevresp_correct', ...
+  'prevresp_error', ...
+  'alpha_ips01_stimwin_resid', ...
+  'beta_3motor_lat_prestimwin', ...
+  'beta_3motor_lat_refwin', ...
+  'beta_3motor_lat_stimwin', ...
+  'gamma_ips23_prestimwin', ...
+  'gamma_ips23_prerefwin', ...
+  'gamma_ips23_refwin', ...
+  'gamma_ips23_stimwin'});
+
+% remove rows with any nans, messes up HDDM
+nans_idx = any(isnan(tabs2{:, :}), 2);
+%assert(mean(nans_idx) < 0.1, 'trying to remove too many nan trials');
+tabs2(nans_idx, :) = [];
+
+writetable(tabs2, sprintf('%s/HDDM/allsubjects_meg_lean.csv', sjdat.path));
+writetable(tabs2, sprintf('%s/CSV/allsubjects_meg_lean.csv', sjdat.path));
 
 end

@@ -74,10 +74,6 @@ if ~isnumeric(sj),
     subjectdata.clean = subjectdata.all;
     subjectdata.clean(ismember(subjectdata.clean, 16)) = [];
 
-%     % test for TFR
-%     subjectdata.cleantmp = subjectdata.clean;
-%     subjectdata.cleantmp(ismember(subjectdata.clean, 49)) = [];
-
     % drug groups
     subjectdata.placebo     = [3,6,9,12,15,18,21,23,26,29,32,35,38,41,44,47,50,56,59];
     subjectdata.atomoxetine = [2,5,8,14,17,20,24,27,30,33,36,39,42,45,48,51,54,57,60,61,63,65];

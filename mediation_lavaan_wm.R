@@ -12,21 +12,19 @@ mydata = read.csv(sprintf("%s/allsubjects_meg_lean.csv", datapath))
 
 # make sure response is a logical array, so logistic regression is used!
 mydata$response <- factor(mydata$response)
-#mydata$stimulus <- factor(mydata$stimulus)
-#mydata$prevresp <- factor(mydata$prevresp)
 
 ## fit alpha and gamma signals together as multiple mediation (with covariation)
-mydata$gamma <- mydata$gamma_ips23_stimwin
-mydata$betalat <- mydata$beta_3motor_lat_refwin
-mydata$alpha <- mydata$alpha_ips01_stimwin_resid
+mydata$gamma_stim <- mydata$gamma_ips23_stimwin #- mydata$gamma_ips23_refwin
+# mydata$gamma_ref <- mydata$gamma_ips23_refwin
+mydata$gamma_delay <- mydata$gamma_ips23_prestimwin - mydata$gamma_ips23_prerefwin
 
 # drop nans
 mydata <- subset(mydata, select=c(subj_idx, stimulus, response, 
-                                  prevresp, prev_correct, betalat, gamma, alpha))
+                                  prevresp, prev_correct, gamma_stim, gamma_delay))
 mydata <- na.omit(mydata)
 
 ## potentially take only previous correct or previous error trials
-prevfeedback <- 'error'
+prevfeedback <- 'all'
 if(prevfeedback == 'correct') {
   print('keeping only previous correct trials')
   mydata <- mydata[(mydata$prev_correct == 1),]
@@ -41,36 +39,21 @@ if(prevfeedback == 'correct') {
 
 multipleMediation <- '
                       # first, define the regression equations
-                      gamma ~ a1 * prevresp + s1 * stimulus
-                      alpha ~ a2 * prevresp + s2 * stimulus
-                      betalat ~ a3 * prevresp 
+                      gamma_stim ~ a1 * prevresp + s1 * stimulus
+                      gamma_delay ~ a2 * prevresp
 
-                      response ~ b1 * gamma + b2 * alpha + b3 * betalat + c * prevresp + s0 * stimulus
+                      response ~ b1 * gamma_stim + b2 * gamma_delay + c * prevresp + s0 * stimulus
 
                       # define the effects
-                      indirect_gamma := a1 * b1
-                      indirect_alpha := a2 * b2
-                      indirect_betalat := a3 * b3
+                      indirect_gamma_stim := a1 * b1
+                      indirect_gamma_delay := a2 * b2
 
                       direct    := c
-                      total     := c + (a1 * b1) + (a2 * b2) + (a3 * b3)
+                      total     := c + (a1 * b1) + (a2 * b2)
                       
                       # specify covariance between the two mediators
                       # https://paolotoffanin.wordpress.com/2017/05/06/multiple-mediator-analysis-with-lavaan/comment-page-1/
-                      betalat ~~ gamma
-                      gamma ~~ alpha
-                      betalat ~~ alpha
-                      '
-
-singleMediation <- '
-                      # first, define the regression equations
-                      gamma ~ a * prevresp + s * stimulus
-                      response ~ b * gamma + c * prevresp + s0 * stimulus
-
-                      # define the effects
-                      indirect := a * b
-                      direct    := c
-                      total     := c + (a * b)
+                      gamma_stim ~~ gamma_delay
                       '
 
 # ============================= #
@@ -89,7 +72,7 @@ for ( subj in unique(c(mydata$subj_idx)) ) {
   summ2 = as.data.frame(param_estimates)
   summ2$subj_idx <- subj
   mediation_results <- rbind(mediation_results, summ2) # append
-  write.csv(mediation_results, sprintf("%s/mediation/lavaan_threemediators_%s.csv", datapath, prevfeedback)) # write at each iteration
+  write.csv(mediation_results, sprintf("%s/mediation/lavaan_wm2_%s.csv", datapath, prevfeedback)) # write at each iteration
   print(subj)
   
 }
