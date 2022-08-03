@@ -6,6 +6,7 @@ If you use this code, please cite the paper.
 Anne Urai, Leiden University, 2022
 a.e.urai@fsw.leidenuniv.nl
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6949711.svg)](https://doi.org/10.5281/zenodo.6949711)
 
 # Data #
 
